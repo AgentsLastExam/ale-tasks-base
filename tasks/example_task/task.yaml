@@ -9,19 +9,30 @@ resources: { cpus: 1, memory_mb: 1024 }
 network: { mode: block } # block | allowlist (+ allowed_hosts) | open
 timeouts: { setup: 60, agent: 300, verify: 120 }
 
-# Stages are symmetric: each names the assets and kits it needs. Scripts are not
-# declared — this folder's setup/ and verify/ directories are copied in when their
-# stage runs, and run.sh executes if present.
+# Stages are symmetric: each names the data it needs and the shared libraries it uses.
+# Scripts are not declared — this folder's setup/ and verify/ directories are copied in
+# when their stage runs, and run.sh executes if present.
+#
+# A mount carries everything needed to find its data, so this file is readable on its
+# own. Listing one under `verify` is what keeps it out of the sandbox while the agent
+# works.
 setup:
-  assets: [] # component names from assets.lock.yaml
-  kits: [] # kit names from kits.lock.yaml
-  prebakeable: false # true only if this setup is deterministic (no per-episode secrets)
+  assets: []
+  # - repo: agents-last-exam/ale-tasks-assets
+  #   revision: <commit>          # a commit, so two runs read the same bytes
+  #   path: example/task/input
+  #   dest: /ale/input            # your choice; there is no framework layout
+  kits: []
 verify:
   assets: []
   kits: [example-kit]
 
-# Values substituted into instruction.md as ${name}. Strict: every declared parameter
-# must be used, and every ${placeholder} must be declared.
+# Paths worth keeping when the episode ends. `collect: none` leaves one in the sandbox.
+artifacts:
+  - { path: /ale/output }
+
+# Values substituted into instruction.md as ${greeting}. Strict: every declared
+# parameter must be used, and every ${placeholder} must be declared.
 params:
   greeting: hello
 
