@@ -27,9 +27,10 @@ verify:
   assets: []
   kits: [example-kit]
 
-# Paths worth keeping when the episode ends. `collect: none` leaves one in the sandbox.
-artifacts:
-  - { path: /ale/output }
+# Absolute paths holding this task's output. Whether a copy is kept is a run-level
+# setting (`artifacts.collect`), not a task's business — the same task feeds a debugging
+# run that keeps everything and a sweep that only wants scores.
+artifacts: [/ale/output]
 
 # Values substituted into instruction.md as ${greeting}. Strict: every declared
 # parameter must be used, and every ${placeholder} must be declared.
