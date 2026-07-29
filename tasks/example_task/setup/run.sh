@@ -6,4 +6,5 @@
 # minted now rather than baked into an image ahead of time.
 set -euo pipefail
 
-printf 'world' > /ale/input/word.txt
+mkdir -p /home/user/input /home/user/output
+printf 'world' > /home/user/input/word.txt

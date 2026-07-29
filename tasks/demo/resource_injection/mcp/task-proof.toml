@@ -1,0 +1,6 @@
+schema_version = 1
+name = "task-proof"
+transport = "stdio"
+command = "python3"
+args = ["/home/user/task_proof_mcp.py"]
+cwd = "/home/user"
