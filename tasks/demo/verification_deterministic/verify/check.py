@@ -17,6 +17,6 @@ verification.check(
         7,
     ),
 )
-verification.metric("checked_files", 1)
+verification.stat("checked_files", 1)
 verification.aggregate("overall")
 verification.write()

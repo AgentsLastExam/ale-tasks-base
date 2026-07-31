@@ -54,9 +54,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+      - name: Build Agent Judge image
+        if: env.OPENAI_API_KEY != '' || env.ANTHROPIC_API_KEY != ''
+        run: |
+          docker build -f .github/agent-judge.Dockerfile -t ale-agent-judge-live:local .
+          sed -i 's|image: sandbox-base-cli|image: docker.io/library/ale-agent-judge-live:local|' tasks/demo/verification_agent_judge/task.yaml
       - name: Validate Codex Agent Judge
         if: env.OPENAI_API_KEY != ''
         run: uvx --from "$ENGINE" ale validate tasks/demo/verification_agent_judge --set verification.agent.adapter=codex-cli --set verification.agent.model=gpt-5.4 --set verification.agent.reasoning_effort=high --set verification.agent.base_url=https://api.openai.com --set verification.agent.api_key_env=OPENAI_API_KEY
       - name: Validate Claude Agent Judge
         if: env.ANTHROPIC_API_KEY != ''
-        run: uvx --from "$ENGINE" ale validate tasks/demo/verification_agent_judge --set verification.agent.adapter=claude-code --set verification.agent.model=claude-sonnet-4 --set verification.agent.reasoning_effort=high --set verification.agent.base_url=https://api.anthropic.com --set verification.agent.api_key_env=ANTHROPIC_API_KEY
+        run: uvx --from "$ENGINE" ale validate tasks/demo/verification_agent_judge --set verification.agent.adapter=claude-code --set verification.agent.model=claude-sonnet-5 --set verification.agent.reasoning_effort=high --set verification.agent.base_url=https://api.anthropic.com --set verification.agent.api_key_env=ANTHROPIC_API_KEY
