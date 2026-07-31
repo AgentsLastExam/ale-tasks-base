@@ -25,7 +25,7 @@ setup:
   kits: []
 verify:
   assets: []
-  kits: [example-kit]
+  kits: [example_kit]
 
 # Absolute paths holding this task's output. Whether a copy is kept is a run-level
 # setting (`artifacts.collect`), not a task's business — the same task feeds a debugging

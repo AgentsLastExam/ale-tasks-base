@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# The known-good solution. `ale validate` runs this in place of the agent and requires
-# every verifier reward to equal 1.0; a task nobody can solve never reaches the registry.
+# The known-good solution. `ale validate` first requires untouched zero rewards, then
+# runs this in place of the agent and requires the same rewards to equal 1.0.
 set -euo pipefail
 
 greeting="$(python3 -c 'import json,os; print(json.load(open(os.environ["ALE_PARAMS_JSON"]))["greeting"])')"

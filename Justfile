@@ -12,10 +12,6 @@ _default:
 new-task path:
     @uvx --from {{ ENGINE }} ale new task tasks/{{ path }}
 
-# Regenerate kits.lock.yaml from the contents of kits/. Never edit that file by hand.
-lock:
-    @uvx --from {{ ENGINE }} ale kit lock .
-
 # Structural checks: manifests, layout, references, visibility rules.
 lint:
     @uvx --from {{ ENGINE }} ale lint .
@@ -26,7 +22,6 @@ validate:
 
 # Everything CI runs.
 check: lint validate
-    @uvx --from {{ ENGINE }} ale kit lock . --check
 
 # Run one task with a real agent, from this checkout.
 run path *args:
