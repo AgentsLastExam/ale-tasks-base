@@ -95,5 +95,5 @@ verifier image selected by `verify/Dockerfile` plus explicit `verify.image.kind`
 restoration of one file plus one directory artifact. External verifier images use the
 same structured `{kind, ref}` shape. Omission reuses the prepared solver image.
 
-See the engine's `docs/task-authoring.md`, `docs/task-design-principles.md`, and
-`docs/specs/task-folder.md` for the complete contract.
+Start with the engine's `docs/README.md`; the Task workflow is in
+`docs/guides/task-authoring.md` and the format contract in `docs/specs/task-folder.md`.
