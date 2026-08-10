@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 set -euo pipefail
-exec python3 "$(dirname "$0")/check.py"
+exec python3 verify.py

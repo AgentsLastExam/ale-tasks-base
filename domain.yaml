@@ -1,5 +1,0 @@
-# Domain manifest. Two facts and nothing else: data, images and what to collect are
-# declared by individual tasks.
-
-name: example                    # namespace; also the registry key. Lowercase slug.
-requires_core: ">=0.1,<0.2"      # engine versions this repository's tasks target

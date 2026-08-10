@@ -1,28 +1,31 @@
 # Task authoring surface.
 #
-# Every recipe delegates to the `ale` engine, pinned in ENGINE below. That is why rule
-# changes usually reach you as a version bump rather than as a template merge.
-
-ENGINE := "ale-run==0.1.*"
+# Run these recipes with a sibling ALE engine checkout.
+ENGINE := "../ale"
 
 _default:
     @just --list
 
 # Scaffold a new task folder that already passes lint.
 new-task path:
-    @uvx --from {{ ENGINE }} ale new task tasks/{{ path }}
+    @uv run --project {{ ENGINE }} ale new-task tasks/{{ path }}
 
 # Structural checks: manifests, layout, references, visibility rules.
 lint:
-    @uvx --from {{ ENGINE }} ale lint .
+    @uv run --project {{ ENGINE }} ale lint .
 
-# Run each task's oracle in place of the agent and require its declared score.
+# Validate credential-free reference Tasks.
 validate:
-    @uvx --from {{ ENGINE }} ale validate .
+    @uv run --project {{ ENGINE }} ale validate tasks/example_task
+    @uv run --project {{ ENGINE }} ale validate tasks/demo/resource_injection
+    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_deterministic
+    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_domain_a
+    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_domain_b
+    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_separate
 
 # Everything CI runs.
 check: lint validate
 
 # Run one task with a real agent, from this checkout.
 run path *args:
-    @uvx --from {{ ENGINE }} ale run tasks/{{ path }} {{ args }}
+    @uv run --project {{ ENGINE }} ale run tasks/{{ path }} {{ args }}

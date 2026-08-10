@@ -1,82 +1,99 @@
-# ALE tasks — base template
+# ALE Tasks base
 
-The starting point for a task repository. It contains a skeleton, one worked example,
-one reference task for Skill/MCP resource injection, one example kit, and the CI wiring.
-The reference task exists because every harness implementation needs the same executable
-proof that task resources reach the agent.
+Reference collection of independent `core/v1` container and VM Tasks. This repository contains no
+runtime manifest or shared Task code; each folder below `tasks/` is complete on its own.
 
-## Starting a domain repository
+## Folder layout
 
-GitHub allows only one fork of a repository per organisation, so clone rather than fork
-when several domains live in the same org. The result behaves identically:
-
-```bash
-git clone https://github.com/AgentsLastExam/ale-tasks-base.git ale-tasks-<domain>
-cd ale-tasks-<domain>
-git remote rename origin upstream
-git remote add origin <your-new-repo-url>
-git push -u origin main
+```text
+tasks/<path>/
+├── task.yaml
+├── instruction.md
+├── image/
+│   ├── Dockerfile
+│   └── assets/                 # optional large input, ignored by Git
+├── setup/
+│   ├── run.sh
+│   └── assets/                 # optional dynamic-stage data, ignored
+├── verify/
+│   ├── run.sh
+│   ├── verify.py
+│   ├── Dockerfile              # optional separate verifier image
+│   └── assets/                 # optional references, ignored
+├── oracle/
+│   ├── run.sh
+│   └── assets/                 # optional oracle-only data, ignored
+└── tools/
+    ├── skills/<name>/SKILL.md
+    └── mcp/<server>.toml
 ```
 
-Do **not** use GitHub's "Use this template": it creates an unrelated history, and every
-later template update then needs `--allow-unrelated-histories`.
+Every Task explicitly declares `image.kind: container|vm`. A fixed `image/Dockerfile`
+selects a local build and wins over an authored ref; without it, `image.ref` is required.
+Stable packages, services, permissions, and solver-visible state belong in the image.
+`setup/` performs only irreducibly episode-dynamic initialization.
 
-Then fill in `domain.yaml`, delete `tasks/example_task`, and write your first task:
+There is no `domain.yaml`, repository Kit, shared image, implicit `files/`, or top-level
+Skills/MCP. Top-level manifest fields define `base`; variants may override only params,
+resources, and timeouts.
+
+## Assets
+
+Large files remain directly below their owning stage. Each Task repository maps to a
+same-named Hugging Face dataset in the configured assets collection. Pull restores the
+exact local folder structure and push uploads only stage asset roots.
 
 ```bash
-just new-task my_first_task
+cd /absolute/path/to/ale
+export ALE_ASSETS_COLLECTION='Chennzi/assets-6a72bdee6d6b38dc9036c15c'
+
+uv run ale assets status /absolute/path/to/ale-tasks-base
+uv run ale assets pull /absolute/path/to/ale-tasks-base
+uv run ale assets pull --force /absolute/path/to/ale-tasks-base/tasks/demo/external_assets
+uv run ale assets push /absolute/path/to/ale-tasks-base/tasks/demo/external_assets
+```
+
+The public `Chennzi/ale-tasks-base` dataset was last synchronized for this contract at
+commit `863a27f00880dff03001b524f371af025aca548e`.
+
+There is no runtime pull and no asset declaration in `task.yaml`. Dockerfiles use normal
+paths such as:
+
+```dockerfile
+COPY assets/public.txt /home/user/input/public.txt
+```
+
+Setup, verifier, and oracle code use ordinary relative `assets/...` paths. A Task without
+an assets directory requires no Hugging Face configuration.
+
+## Authoring commands
+
+Run the engine CLI from the ALE checkout; this repository does not install `ale-run`:
+
+```bash
+cd /absolute/path/to/ale
+uv run ale new-task /absolute/path/to/ale-tasks-base/tasks/my_task
+uv run ale lint /absolute/path/to/ale-tasks-base
+uv run ale prepare /absolute/path/to/ale-tasks-base/tasks/my_task
+uv run ale validate /absolute/path/to/ale-tasks-base/tasks/my_task
+uv run ale run /absolute/path/to/ale-tasks-base/tasks/my_task --agent oracle
+```
+
+Unqualified selection means base. Use `@hard` or an ordered selector such as
+`@{base,hard}` for additional variants.
+
+The deterministic examples can be validated without model credentials:
+
+```bash
+just lint
 just validate
 ```
 
-## Staying current
+Judge demos require their corresponding run-level model/endpoint/credential and exact
+Agent Judge CLI version configuration. The `verification_separate` demo shows a local
+verifier image selected by `verify/Dockerfile` plus explicit `verify.image.kind`, and exact
+restoration of one file plus one directory artifact. External verifier images use the
+same structured `{kind, ref}` shape. Omission reuses the prepared solver image.
 
-```bash
-git pull upstream main
-```
-
-Template changes touch `.github/`, `Justfile`, `README.md` and the examples; your work
-lives in `tasks/` and `kits/`. The paths do not overlap, so these merges are ordinarily
-clean.
-
-Most rule changes do not even reach here: the rules live in the `ale` tool that CI
-invokes, so tightening a lint is a version bump in `.github/workflows/ci.yml`, not a
-merge.
-
-## Layout
-
-```
-domain.yaml            # domain name and engine version range
-kits/<package>/        # flat importable Python packages with __init__.py
-tasks/<path>/          # one folder per task; nesting is free
-```
-
-`tasks/demo/resource_injection` is the cross-harness acceptance fixture. It requires the
-agent to load a task Skill, call a task MCP server, and use the returned runtime value in
-the verified artifact.
-
-`tasks/demo/verification_*` demonstrate the framework-owned `ale_verify` API:
-deterministic checks, LLM judge, agent judge, and a flat domain kit reused by
-two tasks. Domain kits may import `CheckResult`, `Verification`, and `checks`; they remain
-sandbox-side Python and cannot register host plugins, credentials, provider clients, or
-Harness implementations. The selected name is the exact Python import name; there is no
-`kit.toml` or repository lock file.
-
-A task's identifier is derived from its folder path (`tasks/demo/hello` →
-`demo-hello`) and is opaque: nothing in the framework parses it, so folders can be
-reorganised without touching data or prompts.
-
-## The contract
-
-The normative specifications live with the engine:
-
-- task folder and manifest: `docs/specs/task-folder.md`
-- vocabulary: `docs/specs/lexicon.md`
-- decisions: `docs/adr/`
-
-Two rules are worth repeating here because they are easy to get wrong:
-
-1. **A task decides where its own data goes.** Each asset mount names an absolute
-   destination and each artifact an absolute path; there is no framework layout to
-   conform to. Write those same paths literally in the instruction.
-2. **Gold answers go under `verify`.** What keeps them away from an agent is timing:
-   a mount listed there is copied in during scoring and is absent while the agent works.
+See the engine's `docs/task-authoring.md`, `docs/task-design-principles.md`, and
+`docs/specs/task-folder.md` for the complete contract.

@@ -7,34 +7,36 @@ on:
 
 # The rules live in the engine, not in this file. Tightening a lint reaches every task
 # repository as a version bump here — no template merge required.
-env:
-  ENGINE: ale-run==0.1.*
-
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: AgentsLastExam/ale
+          path: ale-engine
 
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
 
-      - name: Lint task and kit structure
-        run: uvx --from "$ENGINE" ale lint .
+      - name: Lint Task structure
+        run: uv run --project ale-engine ale lint .
 
       - name: Oracles reach their declared scores
         run: |
-          uvx --from "$ENGINE" ale validate tasks/example_task
-          uvx --from "$ENGINE" ale validate tasks/demo/resource_injection
-          uvx --from "$ENGINE" ale validate tasks/demo/verification_deterministic
-          uvx --from "$ENGINE" ale validate tasks/demo/verification_domain_a
-          uvx --from "$ENGINE" ale validate tasks/demo/verification_domain_b
+          uv run --project ale-engine ale validate tasks/example_task
+          uv run --project ale-engine ale validate tasks/demo/resource_injection
+          uv run --project ale-engine ale validate tasks/demo/verification_deterministic
+          uv run --project ale-engine ale validate tasks/demo/verification_domain_a
+          uv run --project ale-engine ale validate tasks/demo/verification_domain_b
+          uv run --project ale-engine ale validate tasks/demo/verification_separate
 
       - name: Guest code parses on Python 3.12
         run: |
           uv python install 3.12
-          uv run --no-project --python 3.12 python -m compileall -q kits tasks
+          uv run --no-project --python 3.12 python -m compileall -q tasks
 
   live-llm-judge:
     runs-on: ubuntu-latest
@@ -42,9 +44,13 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: AgentsLastExam/ale
+          path: ale-engine
       - uses: astral-sh/setup-uv@v5
       - if: env.OPENAI_API_KEY != ''
-        run: uvx --from "$ENGINE" ale validate tasks/demo/verification_llm_judge --set verification.llm.model=gpt-5.4-mini --set verification.llm.reasoning_effort=medium --set verification.llm.base_url=https://api.openai.com --set verification.llm.api_key_env=OPENAI_API_KEY
+        run: uv run --project ale-engine ale validate tasks/demo/verification_llm_judge --set verification.llm.model=gpt-5.4-mini --set verification.llm.reasoning_effort=medium --set verification.llm.base_url=https://api.openai.com --set verification.llm.api_key_env=OPENAI_API_KEY
 
   live-agent-judge:
     runs-on: ubuntu-latest
@@ -53,15 +59,14 @@ jobs:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: AgentsLastExam/ale
+          path: ale-engine
       - uses: astral-sh/setup-uv@v5
-      - name: Build Agent Judge image
-        if: env.OPENAI_API_KEY != '' || env.ANTHROPIC_API_KEY != ''
-        run: |
-          docker build -f .github/agent-judge.Dockerfile -t ale-agent-judge-live:local .
-          sed -i 's|image: sandbox-base-cli|image: docker.io/library/ale-agent-judge-live:local|' tasks/demo/verification_agent_judge/task.yaml
       - name: Validate Codex Agent Judge
         if: env.OPENAI_API_KEY != ''
-        run: uvx --from "$ENGINE" ale validate tasks/demo/verification_agent_judge --set verification.agent.adapter=codex-cli --set verification.agent.model=gpt-5.4 --set verification.agent.reasoning_effort=high --set verification.agent.base_url=https://api.openai.com --set verification.agent.api_key_env=OPENAI_API_KEY
+        run: uv run --project ale-engine ale validate tasks/demo/verification_agent_judge --set verification.agent.adapter=codex-cli --set verification.agent.version=0.147.0 --set verification.agent.model=gpt-5.4 --set verification.agent.reasoning_effort=high --set verification.agent.base_url=https://api.openai.com --set verification.agent.api_key_env=OPENAI_API_KEY
       - name: Validate Claude Agent Judge
         if: env.ANTHROPIC_API_KEY != ''
-        run: uvx --from "$ENGINE" ale validate tasks/demo/verification_agent_judge --set verification.agent.adapter=claude-code --set verification.agent.model=claude-sonnet-5 --set verification.agent.reasoning_effort=high --set verification.agent.base_url=https://api.anthropic.com --set verification.agent.api_key_env=ANTHROPIC_API_KEY
+        run: uv run --project ale-engine ale validate tasks/demo/verification_agent_judge --set verification.agent.adapter=claude-code --set verification.agent.version=2.1.226 --set verification.agent.model=claude-sonnet-5 --set verification.agent.reasoning_effort=high --set verification.agent.base_url=https://api.anthropic.com --set verification.agent.api_key_env=ANTHROPIC_API_KEY
