@@ -1,4 +1,4 @@
-FROM ghcr.io/agentslastexam/sandbox-base-cli:latest
+FROM ghcr.io/agentslastexam/container-ubuntu22-base:latest
 
 COPY assets/public.txt /home/user/input/public.txt
 
