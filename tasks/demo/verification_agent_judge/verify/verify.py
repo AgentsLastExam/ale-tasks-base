@@ -1,23 +1,35 @@
-from ale_verify import Verification
+from ale_verify import judge, write
 
-verification = Verification()
-verification.judge(
+RUBRIC = {
+    "no": {
+        "score": 0.0,
+        "description": "The executable is missing, fails, or prints another value.",
+    },
+    "yes": {
+        "score": 1.0,
+        "description": "The executable runs successfully and prints exactly hello.",
+    },
+}
+OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "choice": {"enum": list(RUBRIC)},
+        "reasoning": {"type": "string", "minLength": 1},
+    },
+    "required": ["choice", "reasoning"],
+    "additionalProperties": False,
+}
+
+assessment = judge(
     "agent",
     "functional",
     prompt=(
         "Inspect /home/user/output/hello.sh. Execute it if present and judge whether "
-        "it is executable and prints exactly hello."
+        "it is executable and prints exactly hello.\n\n"
+        'Set "choice" to exactly one rubric label and explain it in "reasoning".\n'
+        + "\n".join(f"- {label}: {choice['description']}" for label, choice in RUBRIC.items())
     ),
-    rubric={
-        "no": {
-            "score": 0.0,
-            "description": "The executable is missing, fails, or prints another value.",
-        },
-        "yes": {
-            "score": 1.0,
-            "description": "The executable runs successfully and prints exactly hello.",
-        },
-    },
+    output_schema=OUTPUT_SCHEMA,
 )
-verification.aggregate("overall")
-verification.write()
+functional = {"score": RUBRIC[assessment["choice"]]["score"], **assessment}
+write({"overall": functional["score"], "functional": functional})

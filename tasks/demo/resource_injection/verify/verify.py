@@ -1,10 +1,10 @@
 import json
 from pathlib import Path
 
-from ale_verify import CheckResult, Verification
+from ale_verify import write
 
 
-def result() -> CheckResult:
+def result() -> dict:
     try:
         nonce = Path("/home/user/input/nonce.txt").read_text().strip()
         actual = Path("/home/user/output/result.txt").read_text().strip()
@@ -17,11 +17,10 @@ def result() -> CheckResult:
             and actual == f"SKILL-R7::{nonce}::{fragment}"
         )
         diagnostic = "resource proof matched" if matched else "resource proof differed"
-        return CheckResult(float(matched), diagnostic)
+        return {"score": float(matched), "diagnostic": diagnostic}
     except (FileNotFoundError, json.JSONDecodeError, AttributeError):
-        return CheckResult(0.0, "resource proof is missing or invalid")
+        return {"score": 0.0, "diagnostic": "resource proof is missing or invalid"}
 
 
-verification = Verification()
-verification.check("reward", result())
-verification.write()
+reward = result()
+write({"overall": reward["score"], "reward": reward})
