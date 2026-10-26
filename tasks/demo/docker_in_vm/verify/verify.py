@@ -1,11 +1,7 @@
-from ale_verify import Verification, checks
+from ale_verify import checks, write
 
-verification = Verification()
-verification.check(
-    "nested_container",
-    checks.text_equals(
-        "/home/user/output/nested-container.txt",
-        "nested-container-ok\n",
-    ),
+nested_container = checks.text_equals(
+    "/home/user/output/nested-container.txt",
+    "nested-container-ok\n",
 )
-verification.write()
+write({"overall": nested_container["score"], "nested_container": nested_container})

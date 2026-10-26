@@ -1,13 +1,11 @@
-from ale_verify import Verification, checks
+from ale_verify import checks, write
 
-verification = Verification()
-verification.check(
-    "result",
-    checks.json_value("/home/user/output/result.json", "status", "ok"),
+result = checks.json_value("/home/user/output/result.json", "status", "ok")
+report = checks.text_equals("/var/lib/ale-report/state.txt", "ready")
+write(
+    {
+        "overall": (result["score"] + report["score"]) / 2,
+        "result": result,
+        "report": report,
+    }
 )
-verification.check(
-    "report",
-    checks.text_equals("/var/lib/ale-report/state.txt", "ready"),
-)
-verification.aggregate("overall")
-verification.write()

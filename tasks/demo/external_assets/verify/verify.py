@@ -1,17 +1,15 @@
 import json
 
-from ale_verify import Verification, checks
+from ale_verify import checks, write
 
 
-verification = Verification()
 expected = json.loads(open("assets/expected.json", encoding="utf-8").read())
-verification.check(
-    "public",
-    checks.json_value("/home/user/output/result.json", "public", expected["public"]),
+public = checks.json_value("/home/user/output/result.json", "public", expected["public"])
+service = checks.json_value("/home/user/output/result.json", "service", expected["service"])
+write(
+    {
+        "overall": (public["score"] + service["score"]) / 2,
+        "public": public,
+        "service": service,
+    }
 )
-verification.check(
-    "service",
-    checks.json_value("/home/user/output/result.json", "service", expected["service"]),
-)
-verification.aggregate("overall")
-verification.write()

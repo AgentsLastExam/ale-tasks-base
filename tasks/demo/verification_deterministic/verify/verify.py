@@ -1,22 +1,20 @@
-from ale_verify import Verification, checks
+from ale_verify import checks, write
 
-verification = Verification()
-verification.check(
-    "format",
-    checks.json_value(
-        "/home/user/output/result.json",
-        "status",
-        "ok",
-    ),
+format_check = checks.json_value(
+    "/home/user/output/result.json",
+    "status",
+    "ok",
 )
-verification.check(
+value_check = checks.json_value(
+    "/home/user/output/result.json",
     "value",
-    checks.json_value(
-        "/home/user/output/result.json",
-        "value",
-        7,
-    ),
+    7,
 )
-verification.stat("checked_files", 1)
-verification.aggregate("overall")
-verification.write()
+write(
+    {
+        "overall": (format_check["score"] + value_check["score"]) / 2,
+        "format": format_check,
+        "value": value_check,
+        "measurements": {"checked_files": 1},
+    }
+)
