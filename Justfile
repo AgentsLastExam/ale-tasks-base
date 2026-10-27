@@ -18,6 +18,7 @@ lint:
 validate:
     @uv run --project {{ ENGINE }} ale validate tasks/example_task
     @uv run --project {{ ENGINE }} ale validate tasks/demo/resource_injection
+    @uv run --project {{ ENGINE }} ale validate tasks/demo/tool_smoke
     @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_deterministic
     @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_domain_a
     @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_domain_b
