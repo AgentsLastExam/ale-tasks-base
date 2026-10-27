@@ -1,7 +1,7 @@
 spec_type: core/v1
 name: verification-separate
 image: {kind: container}
-resources: {cpus: 1, memory_mb: 1024}
+resources: {cpus: 1, memory_mb: 4096}
 network: {mode: block}
 timeouts: {setup: 60, agent: 300, verify: 120}
 artifacts:
@@ -10,5 +10,5 @@ artifacts:
 verify:
   environment_mode: separate
   image: {kind: container}
-  resources: {cpus: 1, memory_mb: 1024, storage_mb: null, gpus: 0}
+  resources: {cpus: 1, memory_mb: 4096, storage_mb: null, gpus: 0}
 metadata: {tags: [demo, verification, separate]}

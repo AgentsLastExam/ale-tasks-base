@@ -2,7 +2,7 @@ spec_type: core/v1
 name: external-assets
 image: {kind: container}
 
-resources: {cpus: 1, memory_mb: 512}
+resources: {cpus: 1, memory_mb: 4096}
 network: {mode: block}
 timeouts: {setup: 120, agent: 120, verify: 120}
 artifacts: [/home/user/output]
