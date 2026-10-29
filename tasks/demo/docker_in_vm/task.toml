@@ -1,0 +1,22 @@
+schema_version = "1.4"
+artifacts = ["/home/user/output/nested-container.txt"]
+
+[task]
+name = "agentslastexam/docker-in-vm"
+keywords = ["demo", "vm", "docker"]
+
+[environment]
+cpus = 2
+memory_mb = 4096
+storage_mb = 8192
+
+[agent]
+user = "user"
+timeout_sec = 300
+network_mode = "no-network"
+
+[verifier]
+timeout_sec = 120
+
+[ale]
+sandbox = "vm"
