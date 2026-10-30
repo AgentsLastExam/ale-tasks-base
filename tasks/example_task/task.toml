@@ -1,0 +1,18 @@
+schema_version = "1.4"
+artifacts = ["/home/user/output"]
+
+[task]
+name = "agentslastexam/example-task"
+keywords = ["example"]
+
+[environment]
+cpus = 1
+memory_mb = 4096
+
+[agent]
+user = "user"
+timeout_sec = 300
+network_mode = "no-network"
+
+[verifier]
+timeout_sec = 120
