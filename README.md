@@ -11,18 +11,15 @@ tasks/<path>/
 ├── task.toml
 ├── instruction.md
 ├── environment/
-│   ├── Dockerfile              # container or Linux VM image ([ale].sandbox); context
+│   ├── Dockerfile              # container or Linux VM image ([environment].vm); context
 │   │                           # environment/ without setup/
 │   └── setup/setup.sh          # optional per-episode initialization
 ├── tests/
 │   ├── test.sh
 │   ├── verify.py
 │   └── Dockerfile              # optional separate verifier image
-├── solution/
-│   └── solve.sh
-└── tools/
-    ├── skills/<name>/SKILL.md
-    └── mcp/<server>.toml
+└── solution/
+    └── solve.sh
 ```
 
 Stable packages, services, permissions, and solver-visible state belong in the image.
