@@ -1,4 +1,4 @@
-schema_version = "1.4"
+schema_version = "1.4+ale.1"
 artifacts = ["/home/user/output/result.json", "/var/lib/ale-report"]
 
 [task]
