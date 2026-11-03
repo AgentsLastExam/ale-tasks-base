@@ -30,9 +30,10 @@ contract is the engine's `docs/specs/task-authoring.md`.
 
 Large files live in `assets/` directories beside the files that read them:
 `environment/assets/` (the image build, container or VM), `tests/assets/` and
-`solution/assets/`. They are ignored by Git and synchronized with the
-private Hugging Face dataset `agents-last-exam/ale-tasks-base`, which mirrors their paths.
-Asset commands authenticate with `ALE_HF_TOKEN` from the engine checkout's `.env`:
+`solution/assets/`. They are ignored by Git and synchronized with the gated Hugging Face
+dataset [`agents-last-exam/ale-tasks-base`](https://huggingface.co/datasets/agents-last-exam/ale-tasks-base),
+which mirrors their paths. Request access on its page; once an administrator approves it,
+asset commands authenticate with `ALE_HF_TOKEN` from the engine checkout's `.env`:
 
 ```bash
 cd /absolute/path/to/ale
