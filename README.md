@@ -1,8 +1,8 @@
 # ALE Tasks base
 
 Reference collection of independent container and VM Tasks in ALE's `task.toml` format:
-Harbor's task layout and schema 1.4 plus an `[ale]` table. This repository contains no shared
-Task code; each folder below `tasks/` is complete on its own.
+Harbor's Task layout and fields, with ALE's additions in the Harbor tables they configure. This
+repository contains no shared Task code; each folder below `tasks/` is complete on its own.
 
 ## Folder layout
 
