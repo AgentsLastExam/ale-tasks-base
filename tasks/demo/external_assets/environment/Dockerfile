@@ -1,4 +1,4 @@
-FROM ghcr.io/agentslastexam/container-ubuntu22-base:latest
+FROM ghcr.io/agentslastexam/container-ubuntu22-base:0.1.1
 
 COPY assets/public.txt /home/user/input/public.txt
 # Served by setup: root-only, so the agent reaches it only through the service.
