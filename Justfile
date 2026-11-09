@@ -24,7 +24,7 @@ validate:
     @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_domain_b
     @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_separate
 
-# Everything CI runs.
+# Lint, then validate.
 check: lint validate
 
 # Run one task with a real agent, from this checkout.
