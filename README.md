@@ -24,15 +24,19 @@ tasks/<path>/
 
 Stable packages, services, permissions, and solver-visible state belong in the image.
 `environment/setup/` performs only irreducibly episode-dynamic initialization. The format
-contract is the engine's `docs/specs/task-authoring.md`.
+contract is the engine's
+[task-authoring.md](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/task-authoring.md),
+and what makes a Task acceptable is its
+[task-quality-standard.md](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/task-quality-standard.md).
 
 ## Assets
 
 Large files live in `assets/` directories beside the files that read them:
 `environment/assets/` (the image build, container or VM), `tests/assets/` and
-`solution/assets/`. They are ignored by Git and synchronized with the
-private Hugging Face dataset `agents-last-exam/ale-tasks-base`, which mirrors their paths.
-Asset commands authenticate with `ALE_HF_TOKEN` from the engine checkout's `.env`:
+`solution/assets/`. They are ignored by Git and synchronized with the gated Hugging Face
+dataset [`agents-last-exam/ale-tasks-base`](https://huggingface.co/datasets/agents-last-exam/ale-tasks-base),
+which mirrors their paths. Request access on its page; once an administrator approves it,
+asset commands authenticate with `ALE_HF_TOKEN` from the engine checkout's `.env`:
 
 ```bash
 cd /absolute/path/to/ale
@@ -49,7 +53,8 @@ COPY assets/public.txt /home/user/input/public.txt
 ```
 
 A Task without an assets directory requires no Hugging Face configuration. The specification
-is the engine's `docs/specs/task-assets.md`.
+is the engine's
+[task-assets.md](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/task-assets.md).
 
 ## Authoring commands
 
