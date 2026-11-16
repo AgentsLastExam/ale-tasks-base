@@ -11,8 +11,8 @@ tasks/<path>/
 ├── task.toml
 ├── instruction.md
 ├── environment/
-│   ├── Dockerfile              # container or Linux VM image ([environment].vm); context
-│   │                           # environment/ without setup/
+│   ├── Dockerfile              # container image; context environment/ without setup/
+│   ├── build.sh                # or a VM image built on [environment].image, same context
 │   └── setup/setup.sh          # optional per-episode initialization
 ├── tests/
 │   ├── test.sh
@@ -80,4 +80,4 @@ Judge demos require their corresponding run-level model/endpoint/credential and 
 Agent Judge CLI version configuration. The `verification_separate` demo shows a separate
 verifier built from `tests/Dockerfile` with its own `[verifier.environment]` resources, and
 exact restoration of one file plus one directory artifact. A separate verifier without
-`tests/Dockerfile` or `[verifier.environment].docker_image` reuses the prepared solver image.
+`tests/Dockerfile` or `[verifier.environment].image` reuses the prepared solver image.
