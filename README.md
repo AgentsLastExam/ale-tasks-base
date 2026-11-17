@@ -56,6 +56,14 @@ A Task without an assets directory requires no Hugging Face configuration. The s
 is the engine's
 [task-assets.md](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/task-assets.md).
 
+## Repository conventions
+
+[CONVENTIONS.md](CONVENTIONS.md) is how a Task repository keeps code in Git and all Task
+material in its `assets/` roots on the Hugging Face dataset, how a Task's version is derived
+from both, how [`taxonomy/`](taxonomy/README.md) places Tasks on a domain taxonomy, and when a
+Task goes to `main` or to its own pull request. This repository's `demo/external_assets` and
+`taxonomy/` are the worked examples.
+
 ## Authoring commands
 
 Run the engine CLI from the ALE checkout; this repository does not install `ale-run`:
