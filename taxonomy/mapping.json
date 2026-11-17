@@ -1,0 +1,138 @@
+{
+ "schema": "ale-taxonomy-mapping@1",
+ "taxonomy": "ale-tasks-base",
+ "tree": "taxonomy/tree.json",
+ "tree_sha256": "b036604fbe7346a95a43cd245583eaa58aea97184f1dac0e338e4fe9a3cb9172",
+ "entries": [
+  {
+   "task": "demo/docker_in_vm",
+   "node": "env-vm",
+   "role": "primary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "Runs a nested container workload inside a Linux VM the Task builds.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "demo/external_assets",
+   "node": "env-assets",
+   "role": "primary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "Reads environment, tests and solution material from the Task's assets/ roots on the dataset.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "demo/external_assets",
+   "node": "ver-deterministic",
+   "role": "secondary",
+   "status": "proposed",
+   "confidence": "medium",
+   "basis": "Its verifier compares the output with expected values from tests/assets/.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "demo/resource_injection",
+   "node": "env-resources",
+   "role": "primary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "Completes a proof through an injected Skill and MCP server.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "demo/tool_smoke",
+   "node": "agent-tools",
+   "role": "primary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "The agent tests every tool available to it and reports the results.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "demo/verification_agent_judge",
+   "node": "ver-agent",
+   "role": "primary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "An Agent Judge inspects the produced script.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "demo/verification_deterministic",
+   "node": "ver-deterministic",
+   "role": "primary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "Exact JSON comparison with no model.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "demo/verification_domain_a",
+   "node": "ver-task-local",
+   "role": "primary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "Carries its own copy of the approval check; no verifier code is shared between Tasks.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "demo/verification_domain_b",
+   "node": "ver-task-local",
+   "role": "primary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "Same check as verification_domain_a, kept as an independent copy in this Task.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "demo/verification_llm_judge",
+   "node": "ver-llm",
+   "role": "primary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "An LLM Judge grades a free-text explanation.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "demo/verification_separate",
+   "node": "ver-separate",
+   "role": "primary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "Verification runs in its own sandbox built from tests/Dockerfile.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "example_task",
+   "node": "env-image",
+   "role": "primary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "The minimal Task: its image is built from environment/Dockerfile with a fixed input file.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  },
+  {
+   "task": "example_task",
+   "node": "ver-deterministic",
+   "role": "secondary",
+   "status": "proposed",
+   "confidence": "high",
+   "basis": "Its verifier compares the greeting exactly.",
+   "by": "example placement (2026-11-17)",
+   "at": "2026-11-17"
+  }
+ ]
+}

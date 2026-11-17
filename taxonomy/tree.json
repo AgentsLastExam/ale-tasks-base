@@ -1,0 +1,83 @@
+{
+ "schema": "ale-taxonomy-tree@1",
+ "taxonomy": "ale-tasks-base",
+ "source": {
+  "description": "Example taxonomy: the capabilities this repository's demo Tasks show. Written for this repository, not taken from an external page.",
+  "fetched_at": "2026-11-17",
+  "sha256": "b036604fbe7346a95a43cd245583eaa58aea97184f1dac0e338e4fe9a3cb9172"
+ },
+ "root": {
+  "id": "ale-tasks-base",
+  "name_en": "ALE Task capabilities",
+  "children": [
+   {
+    "id": "env",
+    "name_en": "Environment and inputs",
+    "children": [
+     {
+      "id": "env-image",
+      "name_en": "Image built from the Task folder",
+      "children": []
+     },
+     {
+      "id": "env-vm",
+      "name_en": "Linux virtual machine",
+      "children": []
+     },
+     {
+      "id": "env-assets",
+      "name_en": "Material from the Hugging Face dataset",
+      "children": []
+     },
+     {
+      "id": "env-resources",
+      "name_en": "Task Skills and MCP servers",
+      "children": []
+     }
+    ]
+   },
+   {
+    "id": "agent",
+    "name_en": "Agent behaviour",
+    "children": [
+     {
+      "id": "agent-tools",
+      "name_en": "Tool discovery and use",
+      "children": []
+     }
+    ]
+   },
+   {
+    "id": "ver",
+    "name_en": "Verification",
+    "children": [
+     {
+      "id": "ver-deterministic",
+      "name_en": "Deterministic checks",
+      "children": []
+     },
+     {
+      "id": "ver-task-local",
+      "name_en": "Task-local verifier code",
+      "children": []
+     },
+     {
+      "id": "ver-llm",
+      "name_en": "LLM Judge",
+      "children": []
+     },
+     {
+      "id": "ver-agent",
+      "name_en": "Agent Judge",
+      "children": []
+     },
+     {
+      "id": "ver-separate",
+      "name_en": "Separate verifier sandbox",
+      "children": []
+     }
+    ]
+   }
+  ]
+ }
+}
