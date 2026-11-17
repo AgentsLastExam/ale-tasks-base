@@ -122,6 +122,34 @@ Every run's RunLock records the asset commit it used and whether local assets we
 with dirty or unsynchronized assets is not reportable. Results bind to a full Task version and
 are never mixed across versions.
 
+## Run records
+
+The episodes that `ale run` produces for a repository's Tasks are kept in a run-record dataset beside its asset dataset, in the same organization: `<organization>/ale-tasks-<domain>-runs` next to `<organization>/ale-tasks-<domain>`. [`agents-last-exam/ale-tasks-demo-runs`](https://huggingface.co/datasets/agents-last-exam/ale-tasks-demo-runs) shows the layout; it holds no runs.
+
+```
+tasks/<path>/
+└── <task version>/                 sha256-<64 hex>, the Task version above
+    ├── version.json                repository, commit, code_tree, dataset, dataset_revision, material_tree, version
+    └── <run id>/                   the run directory name ale run created under runs/
+        └── <episode id>/           the episode directory exactly as ale run wrote it: result.json, lock.json,
+                                    trajectory.json, verification.json, Judge records, traces, blobs/, attempts/
+```
+
+- Only real `ale run` episodes are uploaded, and only under the Task version their RunLock names:
+  its Task source and its asset commit must match `version.json`, and its assets must be clean.
+  Runs of different versions are never mixed; results are compared within a version.
+- `version.json` records which repository commit and which asset revision a version's runs used,
+  the pairing the repository itself does not keep.
+- What each record holds is the engine's [trace specification](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/trace.md); consumers read
+  each run's immediate episode folders (`*/result.json`), not the archived attempts.
+- Every file under `tasks/` is stored with Git LFS. The dataset is gated like the asset dataset:
+  run records hold what the agent saw and produced, the verifier's details and Judge reasoning.
+  ALE redacts the credentials it knows; review a run before uploading it all the same.
+
+```bash
+hf upload <organization>/ale-tasks-<domain>-runs runs/<run id> tasks/<path>/<task version>/<run id> --repo-type dataset
+```
+
 ## Taxonomy and placements
 
 `taxonomy/` places Tasks on the domain's task taxonomy. It is kept outside the Task folders on
