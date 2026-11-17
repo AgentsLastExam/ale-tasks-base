@@ -14,18 +14,18 @@ new-task path:
 lint:
     @uv run --project {{ ENGINE }} ale lint .
 
-# Validate credential-free reference Tasks.
-validate:
-    @uv run --project {{ ENGINE }} ale validate tasks/example_task
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/resource_injection
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/tool_smoke
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_deterministic
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_domain_a
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_domain_b
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_separate
+# Calibrate credential-free reference Tasks.
+calibrate:
+    @uv run --project {{ ENGINE }} ale calibrate tasks/example_task
+    @uv run --project {{ ENGINE }} ale calibrate tasks/demo/resource_injection
+    @uv run --project {{ ENGINE }} ale calibrate tasks/demo/tool_smoke
+    @uv run --project {{ ENGINE }} ale calibrate tasks/demo/verification_deterministic
+    @uv run --project {{ ENGINE }} ale calibrate tasks/demo/verification_domain_a
+    @uv run --project {{ ENGINE }} ale calibrate tasks/demo/verification_domain_b
+    @uv run --project {{ ENGINE }} ale calibrate tasks/demo/verification_separate
 
-# Lint, then validate.
-check: lint validate
+# Lint, then calibrate.
+check: lint calibrate
 
 # Run one task with a real agent, from this checkout.
 run path *args:
