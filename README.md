@@ -184,13 +184,20 @@ python3 taxonomy/check.py --counts   # Tasks per node, ancestors included
 
 ## Merging Tasks
 
+The step-by-step guide for contributors, with a pull request template, is the
+[`ale-contribute` skill](https://github.com/AgentsLastExam/ale-skills/blob/main/skills/ale-contribute/SKILL.md).
+
+- One Task per pull request: it adds or changes exactly one Task and touches only `tasks/<path>/`.
+  Repository-wide files (README, `taxonomy/`, CI) change in their own pull requests.
 - A Task that builds and verifies goes to `main`.
 - A Task blocked on something outside the repository (missing source material, a service, a
   licence) goes in its own pull request, one Task per pull request. Its `task.toml` records
   `[metadata] blocked = true` and `blocked_reason`; the pull request says what would unblock it.
-- A Task still in its pull request keeps its `taxonomy/mapping.json` row on `main`. `check.py`
-  reports such rows as not on the branch instead of failing, so concurrent Task pull requests never
-  edit the same file.
+- A Task's pull request does not edit `taxonomy/mapping.json`: its placement (primary node,
+  optional secondary nodes, confidence, basis) is proposed in the pull request description, and a
+  maintainer records it on `main` as `proposed`. A Task still in its pull request keeps that row on
+  `main`; `check.py` reports such rows as not on the branch instead of failing, so concurrent Task
+  pull requests never edit the same file.
 - A Task's material is pushed to the dataset when its code is pushed, including for a Task in a
   pull request; the dataset only ever holds material, never code.
 
