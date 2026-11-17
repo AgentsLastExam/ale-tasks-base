@@ -16,13 +16,17 @@ AgentsLastExam/ale-tasks-<domain>            GitHub: code and configuration
 │   ├── environment/assets/  tests/assets/  solution/assets/      ignored by Git
 └── taxonomy/                                domain taxonomy and Task placements (section 4)
 
-agents-last-exam/ale-tasks-<domain>          Hugging Face dataset: all Task material
+<namespace>/ale-tasks-<domain>                Hugging Face dataset: all Task material
 └── tasks/<path>/{environment,tests,solution}/assets/…             same paths as the repository
 ```
 
-The dataset name is the repository name, in the `agents-last-exam` namespace. It is public and
-gated: anyone sees the file list, only approved users download. Paths mirror the repository
-exactly, so `tasks/demo/external_assets/tests/assets/expected.json` is the same file in both.
+The dataset name is the repository name. Its namespace is `agents-last-exam` unless the engine
+checkout's `.env` sets `ALE_ASSETS_NAMESPACE` to the team's own organization, e.g. `ale-or` for
+`AgentsLastExam/ale-tasks-or` → `ale-or/ale-tasks-or`. It is public and gated: anyone sees the
+file list, only approved users download. Paths mirror the repository exactly, so
+`tasks/demo/external_assets/tests/assets/expected.json` is the same file in both.
+[`ale-or/ale-tasks-demo`](https://huggingface.co/datasets/ale-or/ale-tasks-demo) is an example
+dataset holding that one Task's material, with a card describing the layout.
 
 ## 2. Code in Git, material on the Hub
 
