@@ -12,3 +12,4 @@ dist/
 tasks/**/environment/assets/
 tasks/**/tests/assets/
 tasks/**/solution/assets/
+tasks/**/calibration/*/assets/

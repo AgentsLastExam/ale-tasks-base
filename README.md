@@ -218,15 +218,15 @@ cd /absolute/path/to/ale
 uv run ale new-task /absolute/path/to/ale-tasks-base/tasks/my_task
 uv run ale lint /absolute/path/to/ale-tasks-base
 uv run ale prepare /absolute/path/to/ale-tasks-base/tasks/my_task
-uv run ale validate /absolute/path/to/ale-tasks-base/tasks/my_task
+uv run ale calibrate /absolute/path/to/ale-tasks-base/tasks/my_task
 uv run ale run /absolute/path/to/ale-tasks-base/tasks/my_task --agent oracle
 ```
 
-The deterministic examples can be validated without model credentials:
+The deterministic examples can be calibrated without model credentials:
 
 ```bash
 just lint
-just validate
+just calibrate
 ```
 
 Judge demos require their corresponding run-level model/endpoint/credential and exact
