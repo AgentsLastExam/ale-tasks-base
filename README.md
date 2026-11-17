@@ -29,40 +29,150 @@ contract is the engine's
 and what makes a Task acceptable is its
 [task-quality-standard.md](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/task-quality-standard.md).
 
-## Assets
+## Code in Git, material on the Hub
 
-Large files live in `assets/` directories beside the files that read them:
-`environment/assets/` (the image build, container or VM), `tests/assets/` and
-`solution/assets/`. They are ignored by Git and synchronized with the gated Hugging Face
-dataset [`agents-last-exam/ale-tasks-base`](https://huggingface.co/datasets/agents-last-exam/ale-tasks-base),
-which mirrors their paths. Request access on its page; once an administrator approves it,
-asset commands authenticate with `ALE_HF_TOKEN` from the engine checkout's `.env`:
+Task code and configuration live in Git. **All** Task material, whatever its size, lives in the
+stage `assets/` directories, which Git ignores, and is synchronized with the gated Hugging Face
+dataset [`agents-last-exam/ale-tasks-base`](https://huggingface.co/datasets/agents-last-exam/ale-tasks-base), which mirrors their paths exactly:
+`tasks/<path>/tests/assets/x` here is `tasks/<path>/tests/assets/x` there. The dataset name is the repository name; its namespace is `agents-last-exam` unless `ALE_ASSETS_NAMESPACE` names a team's own organization (`AgentsLastExam/ale-tasks-<domain>` → `<team organization>/ale-tasks-<domain>`). This repository uses the default.
+
+| Material | Asset root | How stage code reaches it |
+|---|---|---|
+| Inputs the agent works from | `environment/assets/` | the image build copies it, e.g. `COPY assets/input/ /home/user/input/` |
+| Reference deliverables of the oracle | `solution/assets/` | `solve.sh` copies it, e.g. `cp -a assets/reference/. /home/user/output/` |
+| Rubrics, expected values, reference and source documents of the verifier | `tests/assets/` | the verifier reads `assets/…` by relative path |
+
+Material is data an author supplies rather than writes as program logic: documents, spreadsheets,
+images, data files, rubric workbooks, expected outputs. `task.toml`, `instruction.md`, the
+Dockerfile and build scripts, `setup/`, `test.sh`, `verify.py` and other verifier code, and
+`solve.sh` stay in Git. When a verifier was written to read material at another path, its entry
+links `tests/assets/` back to those paths before it runs instead of editing the scorer.
+
+`demo/external_assets` shows all three: `environment/assets/public.txt` and `service-response.txt`
+(copied by its Dockerfile, e.g. `COPY assets/public.txt /home/user/input/public.txt`),
+`tests/assets/expected.json` (read by `verify.py`) and `solution/assets/result.json` (copied by
+`solve.sh`), all four on the dataset under `tasks/demo/external_assets/`.
+
+Running a Task never downloads assets, and `task.toml` declares none. Request access on the
+dataset's page; once an administrator approves it, asset commands authenticate with
+`ALE_HF_TOKEN` from the engine checkout's `.env`:
 
 ```bash
 cd /absolute/path/to/ale
 uv run ale assets status /absolute/path/to/ale-tasks-base
-uv run ale assets pull /absolute/path/to/ale-tasks-base
-uv run ale assets push /absolute/path/to/ale-tasks-base/tasks/demo/external_assets
+uv run ale assets pull   /absolute/path/to/ale-tasks-base                 # after every fresh clone
+uv run ale assets push   /absolute/path/to/ale-tasks-base/tasks/<path>    # one or more Task paths
 ```
 
-Running a Task never downloads assets, and `task.toml` declares none. Stage code reads them
-through ordinary relative paths, for example in `environment/Dockerfile`:
+Push Task paths, not the whole collection, when other Tasks live only on unmerged branches. Each
+push makes one dataset commit per Task, titled `Update tasks/<path> assets`; merge a change's code
+and push its material together. Two recoveries:
 
-```dockerfile
-COPY assets/public.txt /home/user/input/public.txt
+- A push of a Task whose assets were pushed before is rejected as `non-fast-forward`, and Tasks
+  later in the batch are skipped: its cached checkpoint branch is stale. Remove
+  `.ale-cache/asset-worktrees/tasks/<path>` (`git worktree remove` in `.git/ale-assets/repository`),
+  the branch `manual/tasks/<path>` there and `.ale-cache/asset-worktrees/tasks/<path>.publication.json`,
+  then push again and check `ale assets status`.
+- After the dataset moves to another organization, a checkout that pushed before refuses with
+  `asset workspace belongs to a different Task repository`: remove its `.ale-cache/` and
+  `.git/ale-assets/` once and run the command with the new namespace.
+
+The specification is the engine's [task-assets.md](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/task-assets.md).
+
+## Versions
+
+There are no hand-written version numbers or tags; every identity is a content hash that Git or
+the Hub computes.
+
+| Identity | Form | Changes when |
+|---|---|---|
+| Task code | git tree id of `tasks/<path>` on `main` | a file of this Task's code or configuration changes |
+| Task material | git tree id of `tasks/<path>` on the dataset (LFS pointers carry each file's sha256) | a material file of this Task is added, removed or changed |
+| Dataset revision | the dataset's commit id | any Task's material is pushed |
+| Task version | sha256 over the two trees (below) | the Task's code or material changes |
+
+Both trees cover only the Task's own folder, so each Task is versioned independently: pushing
+another Task's material moves the dataset revision but no other Task's tree. The dataset revision
+is recorded beside a version, never inside it.
+
+```
+version = "sha256:" + sha256(canonical JSON of
+  {"schema": "ale-atlas/task-version@2", "repo": "AgentsLastExam/ale-tasks-base", "path": "tasks/<path>",
+   "code":   {"git_object_format": "sha1", "tree": <code tree>},
+   "assets": {"kind": "hf-dataset", "dataset": <dataset id>, "path": "tasks/<path>", "tree": <material tree>}})
+canonical JSON: keys sorted, separators "," and ":", UTF-8, no ASCII escaping
 ```
 
-A Task without an assets directory requires no Hugging Face configuration. The specification
-is the engine's
-[task-assets.md](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/task-assets.md).
+`assets` is `null` for a Task with no material. `<dataset id>` is the dataset's name when its
+first versions were recorded; moving the dataset to another organization does not change existing
+versions.
 
-## Repository conventions
+Worked example, `demo/external_assets` at repository commit `e122715` and dataset revision
+`e8d8dac`: code tree `c767700875d3d398f005993354e3e1c21a7f6091`, material tree
+`34e189ad6cfad36ebf00fca08ff8eaa17ca218b5`, version
+`sha256:97632300cc4ae07596f9a5bb654e32c69230ca55c652eaa73858948883b19801`.
 
-[CONVENTIONS.md](CONVENTIONS.md) is how a Task repository keeps code in Git and all Task
-material in its `assets/` roots on the Hugging Face dataset, how a Task's version is derived
-from both, how [`taxonomy/`](taxonomy/README.md) places Tasks on a domain taxonomy, and when a
-Task goes to `main` or to its own pull request. This repository's `demo/external_assets` and
-`taxonomy/` are the worked examples.
+```bash
+git rev-parse HEAD:tasks/<path>                                                     # code tree
+curl -s https://huggingface.co/api/datasets/agents-last-exam/ale-tasks-base/revision/main                     # dataset revision
+curl -s https://huggingface.co/api/datasets/agents-last-exam/ale-tasks-base/tree/<revision>/tasks             # material trees
+```
+
+Every run's RunLock records the asset commit it used and whether local assets were dirty; a run
+with dirty or unsynchronized assets is not reportable. Results bind to a full Task version and
+are never mixed across versions.
+
+## Taxonomy and placements
+
+`taxonomy/` places Tasks on the domain's task taxonomy. It is kept outside the Task folders on
+purpose: placements change often, and editing them must never change a Task's code tree or version.
+This repository's `taxonomy/` is a complete example: a small tree of the capabilities its demo Tasks show, with every Task placed; see [`taxonomy/README.md`](taxonomy/README.md).
+
+| File | Content |
+|---|---|
+| `taxonomy/tree.json` | the taxonomy, `ale-taxonomy-tree@1`: `source` (where it came from, when, sha256) and `root`, a tree of `{id, name_en, children}` |
+| `taxonomy/mapping.json` | placements, `ale-taxonomy-mapping@1`: `entries[]` (below) |
+| `taxonomy/check.py` | validation and per-node counts; standard library only |
+
+| Entry field | Meaning |
+|---|---|
+| `task` | path under `tasks/`, e.g. `my_task` or `demo/my_task` |
+| `node` | a node `id` of `tree.json`, or `null` when no node fits (a taxonomy gap worth recording) |
+| `role` | `primary` (exactly one per Task) or `secondary` (at most two) |
+| `status` | `proposed`, `confirmed` or `rejected`; a rejected row stays as history and is not counted |
+| `confidence` | `high`, `medium` or `low` |
+| `basis` | one sentence on why |
+| `same_as` | optional: a tree leaf that is this same case under another id |
+| `by`, `at` | who set the row and when |
+
+A Task counts once at its node and every ancestor. To move a Task, edit its row or mark it
+`rejected` and add a new one; update `status`, `by` and `at`. When the taxonomy changes, replace
+`tree.json`; `check.py` then lists every entry whose node no longer exists.
+
+```bash
+python3 taxonomy/check.py            # Task paths, node ids, one primary per Task, field values
+python3 taxonomy/check.py --counts   # Tasks per node, ancestors included
+```
+
+## Merging Tasks
+
+- A Task that builds and verifies goes to `main`.
+- A Task blocked on something outside the repository (missing source material, a service, a
+  licence) goes in its own pull request, one Task per pull request. Its `task.toml` records
+  `[metadata] blocked = true` and `blocked_reason`; the pull request says what would unblock it.
+- A Task still in its pull request keeps its `taxonomy/mapping.json` row on `main`. `check.py`
+  reports such rows as not on the branch instead of failing, so concurrent Task pull requests never
+  edit the same file.
+- A Task's material is pushed to the dataset when its code is pushed, including for a Task in a
+  pull request; the dataset only ever holds material, never code.
+
+## Imported Tasks
+
+A batch converted from another source records, per Task, in `[metadata]`: `source_platform`,
+`source_id` (the source's own identifier), a link to the source item, `source_snapshot` (date) and
+`conversion_notes`, one line per change made in conversion. The repository root's `IMPORT.md`
+lists the batch: each Task, its source id, and whether it is on `main` or in its pull request with
+the reason.
 
 ## Authoring commands
 

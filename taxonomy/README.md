@@ -1,7 +1,7 @@
 # Taxonomy and Task placements
 
 An example of the `taxonomy/` folder every Task repository keeps; the rules are in
-[CONVENTIONS.md](../CONVENTIONS.md#4-taxonomy-and-placements).
+[the repository README](../README.md#taxonomy-and-placements).
 
 `tree.json` is a small taxonomy of the capabilities this repository's demo Tasks show
 (environment, agent behaviour, verification). A domain repository uses its domain's real
