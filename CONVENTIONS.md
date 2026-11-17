@@ -20,13 +20,26 @@ AgentsLastExam/ale-tasks-<domain>            GitHub: code and configuration
 └── tasks/<path>/{environment,tests,solution}/assets/…             same paths as the repository
 ```
 
-The dataset name is the repository name. Its namespace is `agents-last-exam` unless the engine
-checkout's `.env` sets `ALE_ASSETS_NAMESPACE` to the team's own organization, e.g. `ale-or` for
-`AgentsLastExam/ale-tasks-or` → `ale-or/ale-tasks-or`. It is public and gated: anyone sees the
-file list, only approved users download. Paths mirror the repository exactly, so
-`tasks/demo/external_assets/tests/assets/expected.json` is the same file in both.
-[`ale-or/ale-tasks-demo`](https://huggingface.co/datasets/ale-or/ale-tasks-demo) is an example
-dataset holding that one Task's material, with a card describing the layout.
+The dataset name is the repository name. Its namespace is `agents-last-exam` unless
+`ALE_ASSETS_NAMESPACE` names the team's own organization, set in the engine checkout's `.env` or
+per command:
+
+| Task repository | `ALE_ASSETS_NAMESPACE` | Dataset |
+|---|---|---|
+| `AgentsLastExam/ale-tasks-base` | unset | `agents-last-exam/ale-tasks-base` |
+| `AgentsLastExam/ale-tasks-legal` | `ale-legal` | `ale-legal/ale-tasks-legal` |
+| `AgentsLastExam/ale-tasks-finance` | `ale-finance` | `ale-finance/ale-tasks-finance` |
+| `AgentsLastExam/ale-tasks-or` | `ale-or` | `ale-or/ale-tasks-or` |
+
+Datasets are public and gated: anyone sees the file list, only approved users download. Paths
+mirror the repository exactly, so `tasks/demo/external_assets/tests/assets/expected.json` is the
+same file in both. [`ale-or/ale-tasks-or`](https://huggingface.co/datasets/ale-or/ale-tasks-or)
+starts from a copy of that one Task's material and a card describing the layout.
+
+When a dataset moves to another organization, Hugging Face redirects its old name, but a checkout
+that pushed before keeps an asset cache bound to the old name and refuses with `asset workspace
+belongs to a different Task repository`: remove that checkout's `.ale-cache/` and
+`.git/ale-assets/` once and run the command with the new namespace.
 
 ## 2. Code in Git, material on the Hub
 
