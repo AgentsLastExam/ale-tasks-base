@@ -10,4 +10,4 @@ permissions:
 
 jobs:
   check:
-    uses: AgentsLastExam/ale/.github/workflows/task-check.yml@main
+    uses: AgentsLastExam/orbit/.github/workflows/task-check.yml@main

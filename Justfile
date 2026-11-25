@@ -1,32 +1,32 @@
 # Task authoring surface.
 #
-# Run these recipes with a sibling ALE engine checkout.
-ENGINE := "../ale"
+# Run these recipes with a sibling Orbit engine checkout.
+ENGINE := "../orbit"
 
 _default:
     @just --list
 
 # Scaffold a new task folder that already passes lint.
 new-task path:
-    @uv run --project {{ ENGINE }} ale new-task tasks/{{ path }}
+    @uv run --project {{ ENGINE }} orbit new-task tasks/{{ path }}
 
 # Structural checks: manifests, layout, references, visibility rules.
 lint:
-    @uv run --project {{ ENGINE }} ale lint .
+    @uv run --project {{ ENGINE }} orbit lint .
 
-# Validate credential-free reference Tasks.
-validate:
-    @uv run --project {{ ENGINE }} ale validate tasks/example_task
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/resource_injection
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/tool_smoke
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_deterministic
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_domain_a
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_domain_b
-    @uv run --project {{ ENGINE }} ale validate tasks/demo/verification_separate
+# Calibrate the credential-free reference Tasks.
+calibrate:
+    @uv run --project {{ ENGINE }} orbit calibrate tasks/example_task
+    @uv run --project {{ ENGINE }} orbit calibrate tasks/demo/resource_injection
+    @uv run --project {{ ENGINE }} orbit calibrate tasks/demo/tool_smoke
+    @uv run --project {{ ENGINE }} orbit calibrate tasks/demo/verification_deterministic
+    @uv run --project {{ ENGINE }} orbit calibrate tasks/demo/verification_domain_a
+    @uv run --project {{ ENGINE }} orbit calibrate tasks/demo/verification_domain_b
+    @uv run --project {{ ENGINE }} orbit calibrate tasks/demo/verification_separate
 
-# Lint, then validate.
-check: lint validate
+# Lint, then calibrate.
+check: lint calibrate
 
 # Run one task with a real agent, from this checkout.
 run path *args:
-    @uv run --project {{ ENGINE }} ale run tasks/{{ path }} {{ args }}
+    @uv run --project {{ ENGINE }} orbit run tasks/{{ path }} {{ args }}

@@ -1,5 +1,5 @@
 # Local engine caches and run output
-.ale-cache/
+.orbit-cache/
 runs/
 __pycache__/
 *.py[cod]

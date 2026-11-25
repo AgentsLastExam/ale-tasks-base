@@ -1,7 +1,7 @@
 # ALE Tasks base
 
-Reference collection of independent container and VM Tasks in ALE's `task.toml` format:
-Harbor's Task layout and fields, with ALE's additions in the Harbor tables they configure. This
+Reference collection of independent container and VM Tasks in Orbit's `task.toml` format:
+Harbor's Task layout and fields, with Orbit's additions in the Harbor tables they configure. This
 repository contains no shared Task code; each folder below `tasks/` is complete on its own.
 
 ## Folder layout
@@ -11,8 +11,8 @@ tasks/<path>/
 ├── task.toml
 ├── instruction.md
 ├── environment/
-│   ├── Dockerfile              # container or Linux VM image ([environment].vm); context
-│   │                           # environment/ without setup/
+│   ├── Dockerfile              # container image; context environment/ without setup/
+│   ├── build.sh                # or a VM image built on [environment].image, same context
 │   └── setup/setup.sh          # optional per-episode initialization
 ├── tests/
 │   ├── test.sh
@@ -25,16 +25,16 @@ tasks/<path>/
 Stable packages, services, permissions, and solver-visible state belong in the image.
 `environment/setup/` performs only irreducibly episode-dynamic initialization. The format
 contract is the engine's
-[task-authoring.md](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/task-authoring.md),
+[task-authoring.md](https://github.com/AgentsLastExam/orbit/blob/main/docs/specs/task-authoring.md),
 and what makes a Task acceptable is its
-[task-quality-standard.md](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/task-quality-standard.md).
+[task-quality-standard.md](https://github.com/AgentsLastExam/orbit/blob/main/docs/specs/task-quality-standard.md).
 
 ## Code in Git, material on the Hub
 
 Task code and configuration live in Git. **All** Task material, whatever its size, lives in the
 stage `assets/` directories, which Git ignores, and is synchronized with the gated Hugging Face
 dataset [`agents-last-exam/ale-tasks-base`](https://huggingface.co/datasets/agents-last-exam/ale-tasks-base), which mirrors their paths exactly:
-`tasks/<path>/tests/assets/x` here is `tasks/<path>/tests/assets/x` there. The dataset name is the repository name; its namespace is `agents-last-exam` unless `ALE_ASSETS_NAMESPACE` names a team's own organization (`AgentsLastExam/ale-tasks-<domain>` → `<team organization>/ale-tasks-<domain>`). This repository uses the default.
+`tasks/<path>/tests/assets/x` here is `tasks/<path>/tests/assets/x` there. The dataset name is the repository name; its namespace is `agents-last-exam` unless `ORBIT_ASSETS_NAMESPACE` names a team's own organization (`AgentsLastExam/ale-tasks-<domain>` → `<team organization>/ale-tasks-<domain>`). This repository uses the default.
 
 | Material | Asset root | How stage code reaches it |
 |---|---|---|
@@ -55,13 +55,13 @@ links `tests/assets/` back to those paths before it runs instead of editing the 
 
 Running a Task never downloads assets, and `task.toml` declares none. Request access on the
 dataset's page; once an administrator approves it, asset commands authenticate with
-`ALE_HF_TOKEN` from the engine checkout's `.env`:
+`ORBIT_HF_TOKEN` from the engine checkout's `.env`:
 
 ```bash
-cd /absolute/path/to/ale
-uv run ale assets status /absolute/path/to/ale-tasks-base
-uv run ale assets pull   /absolute/path/to/ale-tasks-base                 # after every fresh clone
-uv run ale assets push   /absolute/path/to/ale-tasks-base/tasks/<path>    # one or more Task paths
+cd /absolute/path/to/orbit
+uv run orbit assets status /absolute/path/to/ale-tasks-base
+uv run orbit assets pull   /absolute/path/to/ale-tasks-base                 # after every fresh clone
+uv run orbit assets push   /absolute/path/to/ale-tasks-base/tasks/<path>    # one or more Task paths
 ```
 
 Push Task paths, not the whole collection, when other Tasks live only on unmerged branches. Each
@@ -70,14 +70,14 @@ and push its material together. Two recoveries:
 
 - A push of a Task whose assets were pushed before is rejected as `non-fast-forward`, and Tasks
   later in the batch are skipped: its cached checkpoint branch is stale. Remove
-  `.ale-cache/asset-worktrees/tasks/<path>` (`git worktree remove` in `.git/ale-assets/repository`),
-  the branch `manual/tasks/<path>` there and `.ale-cache/asset-worktrees/tasks/<path>.publication.json`,
-  then push again and check `ale assets status`.
+  `.orbit-cache/asset-worktrees/tasks/<path>` (`git worktree remove` in `.git/orbit-assets/repository`),
+  the branch `manual/tasks/<path>` there and `.orbit-cache/asset-worktrees/tasks/<path>.publication.json`,
+  then push again and check `orbit assets status`.
 - After the dataset moves to another organization, a checkout that pushed before refuses with
-  `asset workspace belongs to a different Task repository`: remove its `.ale-cache/` and
-  `.git/ale-assets/` once and run the command with the new namespace.
+  `asset workspace belongs to a different Task repository`: remove its `.orbit-cache/` and
+  `.git/orbit-assets/` once and run the command with the new namespace.
 
-The specification is the engine's [task-assets.md](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/task-assets.md).
+The specification is the engine's [task-assets.md](https://github.com/AgentsLastExam/orbit/blob/main/docs/specs/task-assets.md).
 
 ## Versions
 
@@ -124,27 +124,27 @@ are never mixed across versions.
 
 ## Run records
 
-The episodes that `ale run` produces for a repository's Tasks are kept in a run-record dataset beside its asset dataset, in the same organization: `<organization>/ale-tasks-<domain>-runs` next to `<organization>/ale-tasks-<domain>`. [`agents-last-exam/ale-tasks-demo-runs`](https://huggingface.co/datasets/agents-last-exam/ale-tasks-demo-runs) shows the layout; it holds no runs.
+The episodes that `orbit run` produces for a repository's Tasks are kept in a run-record dataset beside its asset dataset, in the same organization: `<organization>/ale-tasks-<domain>-runs` next to `<organization>/ale-tasks-<domain>`. [`agents-last-exam/ale-tasks-demo-runs`](https://huggingface.co/datasets/agents-last-exam/ale-tasks-demo-runs) shows the layout; it holds no runs.
 
 ```
 tasks/<path>/
 └── <task version>/                 sha256-<64 hex>, the Task version above
     ├── version.json                repository, commit, code_tree, dataset, dataset_revision, material_tree, version
-    └── <run id>/                   the run directory name ale run created under runs/
-        └── <episode id>/           the episode directory exactly as ale run wrote it: result.json, lock.json,
+    └── <run id>/                   the run directory name orbit run created under runs/
+        └── <episode id>/           the episode directory exactly as orbit run wrote it: result.json, lock.json,
                                     trajectory.json, verification.json, Judge records, traces, blobs/, attempts/
 ```
 
-- Only real `ale run` episodes are uploaded, and only under the Task version their RunLock names:
+- Only real `orbit run` episodes are uploaded, and only under the Task version their RunLock names:
   its Task source and its asset commit must match `version.json`, and its assets must be clean.
   Runs of different versions are never mixed; results are compared within a version.
 - `version.json` records which repository commit and which asset revision a version's runs used,
   the pairing the repository itself does not keep.
-- What each record holds is the engine's [trace specification](https://github.com/AgentsLastExam/ale/blob/main/docs/specs/trace.md); consumers read
+- What each record holds is the engine's [trace specification](https://github.com/AgentsLastExam/orbit/blob/main/docs/specs/trace.md); consumers read
   each run's immediate episode folders (`*/result.json`), not the archived attempts.
 - Every file under `tasks/` is stored with Git LFS. The dataset is gated like the asset dataset:
   run records hold what the agent saw and produced, the verifier's details and Judge reasoning.
-  ALE redacts the credentials it knows; review a run before uploading it all the same.
+  Orbit redacts the credentials it knows; review a run before uploading it all the same.
 
 ```bash
 hf upload <organization>/ale-tasks-<domain>-runs runs/<run id> tasks/<path>/<task version>/<run id> --repo-type dataset
@@ -211,26 +211,26 @@ the reason.
 
 ## Authoring commands
 
-Run the engine CLI from the ALE checkout; this repository does not install `ale-run`:
+Run the engine CLI from the Orbit checkout; this repository does not install `orbit-run`:
 
 ```bash
-cd /absolute/path/to/ale
-uv run ale new-task /absolute/path/to/ale-tasks-base/tasks/my_task
-uv run ale lint /absolute/path/to/ale-tasks-base
-uv run ale prepare /absolute/path/to/ale-tasks-base/tasks/my_task
-uv run ale validate /absolute/path/to/ale-tasks-base/tasks/my_task
-uv run ale run /absolute/path/to/ale-tasks-base/tasks/my_task --agent oracle
+cd /absolute/path/to/orbit
+uv run orbit new-task /absolute/path/to/ale-tasks-base/tasks/my_task
+uv run orbit lint /absolute/path/to/ale-tasks-base
+uv run orbit prepare /absolute/path/to/ale-tasks-base/tasks/my_task
+uv run orbit calibrate /absolute/path/to/ale-tasks-base/tasks/my_task
+uv run orbit run /absolute/path/to/ale-tasks-base/tasks/my_task --agent oracle
 ```
 
-The deterministic examples can be validated without model credentials:
+The deterministic examples can be calibrated without model credentials:
 
 ```bash
 just lint
-just validate
+just calibrate
 ```
 
 Judge demos require their corresponding run-level model/endpoint/credential and exact
 Agent Judge CLI version configuration. The `verification_separate` demo shows a separate
 verifier built from `tests/Dockerfile` with its own `[verifier.environment]` resources, and
 exact restoration of one file plus one directory artifact. A separate verifier without
-`tests/Dockerfile` or `[verifier.environment].docker_image` reuses the prepared solver image.
+`tests/Dockerfile` or `[verifier.environment].image` reuses the prepared solver image.
